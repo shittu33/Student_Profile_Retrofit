@@ -1,0 +1,7 @@
+lib/config.dart filter=git-crypt diff=git-crypt
+lib/student.g.dart filter=git-crypt diff=git-crypt
+lib/hr.dart filter=git-crypt diff=git-crypt
+*.key filter=git-crypt diff=git-crypt
+*.g.dart filter=git-crypt diff=git-crypt
+*.b.dart filter=git-crypt diff=git-crypt
+secretdir/** filter=git-crypt diff=git-crypt
