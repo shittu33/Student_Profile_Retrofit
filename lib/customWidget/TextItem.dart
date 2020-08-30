@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TextItem extends StatelessWidget {
   final String _title;
@@ -73,6 +74,7 @@ class IconTxtButton extends StatelessWidget {
     );
   }
 }
+
 const sidePadding = 28.0;
 
 class EditText extends StatelessWidget {
@@ -131,4 +133,26 @@ class DatePickerBox extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSimpleSnackBar(BuildContext context, String contentText,
+    {String actionLabel, Function onPressed}) {
+  Scaffold.of(context).showSnackBar(SnackBar(
+    content: Text(contentText),
+    action: SnackBarAction(
+      label: actionLabel,
+      onPressed: onPressed != null ? onPressed : () {},
+    ),
+  ));
+}
+
+showToast() {
+  Fluttertoast.showToast(
+      msg: "You need to add a profile picture",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0);
 }

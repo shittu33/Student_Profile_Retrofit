@@ -1,12 +1,15 @@
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:studentprofileretrofit/helper/GoogleAPIHelper.dart';
 import 'package:studentprofileretrofit/model/student.dart';
 import 'package:studentprofileretrofit/pattern/studentBloc.dart';
 import 'package:studentprofileretrofit/studentDetails.dart';
 import 'package:studentprofileretrofit/studentForm.dart';
 import 'package:studentprofileretrofit/style.dart';
 import 'package:studentprofileretrofit/testScreen.dart';
+import 'config.dart';
 import 'customWidget/TabWidgets.dart';
 import 'customWidget/popUp.dart';
 
@@ -17,7 +20,7 @@ void main() {
 class MyApp extends StatelessWidget {
   static const routeHome = '/';
   static const routeStdScreen = '/stdScreen';
-  static const routeScoreFormScreen = '/stdFormScreen';
+  static const routeStudentFormScreen = '/stdFormScreen';
   static const routeStdDetailsScreen = '/stdDetails';
 
   @override
@@ -25,8 +28,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         routeHome: (context) => StdScoreScreen(),
-//        routeScoreFormScreen: (context) => ScoreFormScreen(),
-        routeScoreFormScreen: (context) => ImageTestScreen(),
+        routeStudentFormScreen: (context) => StdFormScreen(),
+//        routeStudentFormScreen: (context) => ImageTestScreen(),
         routeStdDetailsScreen: (context) => StudentDetailsScreen(),
       },
       title: 'Sample',
@@ -110,11 +113,14 @@ class _StdScoreScreenState extends State<StdScoreScreen> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () async {
-            print("start!!");
-            dynamic result = await Navigator.pushNamed(
-                context, MyApp.routeScoreFormScreen,);
-//            await studentBloc.addStudent(Student.optional());
-            print("inserted!!");
+            Navigator.pushNamed(
+              context,
+              MyApp.routeStudentFormScreen,
+            ).then((studentRecord) async {
+              print(studentRecord);
+              await studentBloc.addStudent(studentRecord);
+              print("inserted!!");
+            });
           },
         ));
   }
@@ -133,6 +139,12 @@ class _MainPageState extends State<MainPage> {
   StudentBloc studentBloc;
 
   _MainPageState(this.studentBloc);
+
+  @override
+  void dispose() {
+    super.dispose();
+    studentBloc.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +192,7 @@ class _MainPageState extends State<MainPage> {
                             switch (choice) {
                               case 'Add New Grade':
                                 dynamic result = await Navigator.pushNamed(
-                                    context, MyApp.routeScoreFormScreen,
+                                    context, MyApp.routeStudentFormScreen,
                                     arguments: student);
 //                                if (result.isNotEmpty) {
 //                                  student.reference.update(result);
@@ -188,21 +200,30 @@ class _MainPageState extends State<MainPage> {
                                 break;
                               case 'delete':
                                 print(student.id);
-                                await studentBloc.deleteStudent(student);
-                                print("Deleted!!");
-//                                dynamic result = await Navigator.pushNamed(
-//                                    context, MyApp.routeScoreFormScreen,
-//                                    arguments: student);
-//                                if (result.isNotEmpty) {
-//                                  student.reference.update(result);
-//                                }
+                                http.Response response =
+                                    await deleteImageFromGoogleCloud(
+                                        BUCKET_NAME, student.imgPath);
+                                if (response.statusCode == 200 ||
+                                    response.statusCode == 204) {
+                                  await studentBloc.deleteStudent(student);
+                                  print("Deleted!!");
+                                } else {
+                                  print(
+                                      "Failed to delete image with status code of ${response.statusCode}");
+                                }
                                 break;
                               case 'update':
                                 print(student.id);
-                                await studentBloc.updateStudent(
-                                    Student.optional(
-                                        id: student.id, fullName: "Jumai"));
-                                print("updated");
+                                dynamic studentRecord =
+                                    await Navigator.pushNamed(
+                                        context, MyApp.routeStudentFormScreen,
+                                        arguments: student);
+                                print(studentRecord);
+                                studentRecord.id = student.id;
+                                await studentBloc.updateStudent(studentRecord);
+                                setState(() {
+                                  print("updated");
+                                });
                             }
                           },
                         ),

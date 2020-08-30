@@ -36,7 +36,6 @@
 # Web related
 lib/generated_plugin_registrant.dart
 lib/config.dart
-lib/model/fd.dart
 # Symbolication related
 app.*.symbolsá
 

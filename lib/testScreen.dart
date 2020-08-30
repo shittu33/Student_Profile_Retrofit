@@ -1,13 +1,11 @@
-import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
+import 'package:studentprofileretrofit/helper/GoogleAPIHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 import 'package:studentprofileretrofit/config.dart';
+
+import 'helper/GoogleAPIHelper.dart';
 
 class ImageTestScreen extends StatefulWidget {
   @override
@@ -22,25 +20,33 @@ class _ImageTestScreenState extends State<ImageTestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var img = "f913fbef-4a72-4b2f-b035-d4767cfcb3a4.jpg";
     return ListView(
       children: [
-        Image.memory(imgByte),
+        Image.memory(imgByte /*,height: 100,width: 100,*/),
+//        Image.network(getFirebaseDownloadUrl(BUCKET_NAME, img)),
         RaisedButton(
             child: Text("Upload"),
             onPressed: () async {
-//              readImage().then((imgByte) {
-//                setState(() {
-//                  this.imgByte = imgByte;
-//                  print("image loaded!!");
-//                });
-//              });
               await _picker
                   .getImage(source: ImageSource.gallery)
-                  .then((pickedFile) {
+                  .then((pickedFile) async {
                 updateImage(pickedFile);
-//          if (!kIsWeb) {
-                uploadFile();
-//          }
+                var uniquePath =
+                    uniqueStoragePath(imgPath, folder: "student_img");
+                print(uniquePath);
+                var response = await uploadByteToGoogleCloud(
+                    BUCKET_NAME, uniquePath, await pickedFile.readAsBytes());
+                if (response.statusCode == 200) {
+                  print("Image Uploaded!!");
+                  print(uniquePath);
+                  readGoogleCloudImage(BUCKET_NAME, uniquePath).then((imgByte) {
+                    setState(() {
+                      this.imgByte = imgByte;
+                      print("image loaded!!");
+                    });
+                  });
+                }
               });
             })
       ],
@@ -53,56 +59,5 @@ class _ImageTestScreenState extends State<ImageTestScreen> {
       this.pickedFile = pickedFile;
       pickedFile.readAsBytes().then((value) => this.imgByte = value);
     });
-  }
-
-  Future<Uint8List> readImage(String imagePath) async {
-//    var imagePath = 'images/fe3fc2b5-4e8f-4d00-9c51-a32b50a86e0d.jpg';
-    var encodedImagePath = Uri.encodeQueryComponent(imagePath);
-    var uri = Uri.parse(
-        'https://www.googleapis.com/storage/v1/b/$BUCKET_NAME/o/$encodedImagePath?alt=media');
-    var client = http.Client();
-    String accessToken = await getAccessToken(client);
-    client.close();
-    return http.readBytes(uri, headers: <String, String>{
-      'Authorization': "Bearer $accessToken",
-    });
-  }
-
-  Future<void> uploadFile() async {
-    var client = http.Client();
-    String accessToken = await getAccessToken(client);
-    imgPath = "images/${imgPath.split("/").last}.jpg";
-    var uri = Uri.parse(
-        'https://www.googleapis.com/upload/storage/v1/b/$BUCKET_NAME/o?uploadType=media&name=$imgPath');
-    await http
-        .post(uri,
-            headers: <String, String>{
-              'Authorization': "Bearer $accessToken",
-              'Content-Type': "image/jpeg"
-            },
-            body: await pickedFile.readAsBytes())
-        .then((response) {
-      print("Response code is ${response.statusCode}");
-    });
-    client.close();
-    readImage(imgPath).then((imgByte) {
-      setState(() {
-        this.imgByte = imgByte;
-        print("image loaded!!");
-      });
-    });
-  }
-
-  Future<String> getAccessToken(http.Client client) async {
-    var accountCredentials =
-        ServiceAccountCredentials.fromJson(jsonCredentials);
-
-    var scopes = [
-      'https://www.googleapis.com/auth/cloud-platform',
-    ];
-    AccessCredentials credentials =
-        await obtainAccessCredentialsViaServiceAccount(
-            accountCredentials, scopes, client);
-    return credentials.accessToken.data;
   }
 }
