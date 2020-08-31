@@ -9,7 +9,7 @@ The app basicly Read,Write,Update and delete Student information details includi
 You might wonder why i didn't use Firebase SDKs instead? well!! while experimenting Firebase Storage on web, i found out that Firebase Storage is not yet officially supported on web, so that inspire me to think of a way to get all the job done without the sdk. Moreover the Firebase SDK will unnecessarily make my Apk size larger than usual in a case where i just need to query or perform a very simple operation on Firestore or Storage like this. its wiser to just use the Api. And meanwhile i don't see anything wrong in exploring this cool method
  
 ### Sample question
- ![The question activity](url)
+ ![Demo](url)
 
 ## Technologies
 **This project was created with:**
@@ -41,32 +41,32 @@ You might wonder why i didn't use Firebase SDKs instead? well!! while experiment
 * Colapsed toolBar and TabBar for populating Student details
 
 ## Setup
-* Clone the repository
-* run pub get command
-* Login to your Firebase console/ create a new project,create firestore database then choose test mode or make the read and write to be true
+1 Clone the repository
+2 run pub get command
+3 Login to your Firebase console/ create a new project,create firestore database then choose test mode or make the read and write to be true
  , do the same with cloud storage( alow read and write).
-* Navigate to the settings icon on your project Overview menu>>project setting>>General tab>> Your project>> web API key, and copy the key(weare going to use it later)
-* Navigate to the settings icon on your project Overview menu>>project setting>>Service Account tab>> Firebase Admin SDK>> at the buttom you will see a 
+4 Navigate to the settings icon on your project Overview menu>>project setting>>General tab>> Your project>> web API key, and copy the key(weare going to use it later)
+5 Navigate to the settings icon on your project Overview menu>>project setting>>Service Account tab>> Firebase Admin SDK>> at the buttom you will see a 
   button(Generate new Private Key) click to download your credential,after download, open the file and copy the required values requested in the next step.
-* inside the /lib folder create a file named config.dart and place the following code:
+6 inside the /lib folder create a file named config.dart and place the following code:
 ``` Dart
-const API_KEY = "<<Your API KEY THAT YOU HAVE COPIED>>";
+const API_KEY = "<<Your API KEY THAT YOU HAVE JUST COPIED ON STEP 4>>";
 const PROJECT_NAME = "<<Ypur project Name ON FIREBASE>>";
 const BUCKET_NAME = "<<Your firebase bucket name(e.g your-project-name.appspot.com)>>";
 get jsonCredentials => <String, String>{
-      "private_key_id": "<<Your privateKey id>>",
-      "private_key":<<YOUR OWN PRIVATE KEY>>",
+      "private_key_id": "<<Your privateKey id (FOUND ON THE DOWNLOADED FILE)>>",
+      "private_key":<<YOUR OWN PRIVATE KEY (FOUND ON THE DOWNLOADED FILE)>>",
       "client_email":
-          "<<THE EMAIL ON YOUR GENERATE FIREBASE CREDENTIAL>>",
-      "client_id": "<<THE CLIENT_ID ON THE >>",
+          "<<THE EMAIL ON THE DOWNLOADED FILE >>",
+      "client_id": "<<THE CLIENT_ID ON THE DOWNLOADED FILE>>",
       "type": "service_account"
     };
 ```
-* After that just go to your terminal and type this command: 
+7 After that just go to your terminal and type this command: 
 ```cmd
 flutter pub run build_runner build
 ```
-* If everything goes fine, you can now build and explore the project more!!!
+8 If everything goes fine, you can now build and explore the project more!!!
 
 ## TODO
 * Authenticated each User and update firebase rule to restrict access
