@@ -8,7 +8,8 @@ The app basicly Read,Write,Update and delete Student information details includi
 ## Moltivation
 You might wonder why i didn't use Firebase SDKs instead? well!! while experimenting Firebase Storage on web, i found out that Firebase Storage is not yet officially supported on web, so that inspire me to think of a way to get all the job done without the sdk. Moreover the Firebase SDK will unnecessarily make my Apk size larger than usual in a case where i just need to query or perform a very simple operation on Firestore or Storage like this. its wiser to just use the Api.
 
-## Advantage of Using REST API for Authenntication,Firestore and Cloud Storage
+## Advantage of Using REST API for Firebase Authentication,Firestore and Cloud Storage
+*Perform all operations without installing the Sdk.
 * Accessing Cloud Storage from a resource-constrained environment, such as Flutter Web. 
 * Read and write Firestore documents data with full admin privileges.
 * Create your own simplified admin console to do things like look up user data or change a user's email address for authentication.
